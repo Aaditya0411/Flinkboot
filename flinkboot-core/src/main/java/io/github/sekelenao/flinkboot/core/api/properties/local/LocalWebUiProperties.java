@@ -3,7 +3,7 @@ package io.github.sekelenao.flinkboot.core.api.properties.local;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.sekelenao.flinkboot.core.internal.annotation.Generated;
-import jakarta.validation.constraints.Positive;
+import org.hibernate.validator.constraints.Range;
 
 import java.io.Serializable;
 import java.util.Objects;
@@ -19,7 +19,7 @@ public final class LocalWebUiProperties implements Serializable {
 
     private final Boolean enabled;
 
-    @Positive
+    @Range
     private final Integer port;
     private final String bindAddress;
 
