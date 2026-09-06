@@ -11,9 +11,9 @@ import java.util.stream.Collectors;
 
 public final class ConfigurationValidator implements AutoCloseable {
 
-    private final ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+    private final ValidatorFactory factory;
 
-    private final Validator validator = factory.getValidator();
+    private final Validator validator;
 
     private final int capacity;
 
@@ -21,6 +21,8 @@ public final class ConfigurationValidator implements AutoCloseable {
         if (capacity <= 0) {
             throw new IllegalArgumentException("Capacity must be strictly positive");
         }
+        this.factory = Validation.buildDefaultValidatorFactory();
+        this.validator = factory.getValidator();
         this.capacity = capacity;
     }
 
