@@ -3,9 +3,8 @@ package io.github.sekelenao.flinkboot.core.api.properties.local;
 import com.fasterxml.jackson.annotation.JsonCreator;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.sekelenao.flinkboot.core.internal.annotation.Generated;
-import org.hibernate.validator.constraints.Range;
-
 import jakarta.validation.constraints.NotNull;
+import org.hibernate.validator.constraints.Range;
 
 import java.io.Serializable;
 import java.util.Objects;
