@@ -7,6 +7,7 @@ import org.junit.jupiter.api.Test;
 import java.lang.reflect.InvocationTargetException;
 
 import static org.junit.jupiter.api.Assertions.assertAll;
+import static org.junit.jupiter.api.Assertions.assertEquals;
 import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertInstanceOf;
 import static org.junit.jupiter.api.Assertions.assertThrows;
@@ -40,6 +41,13 @@ class StrictBooleanParserTest {
             () -> assertThrows(BooleanParsingException.class, () -> StrictBooleanParser.parse("")),
             () -> assertThrows(BooleanParsingException.class, () -> StrictBooleanParser.parse("   "))
         );
+    }
+
+    @Test
+    @DisplayName("Should wrap a null value in BooleanParsingException")
+    void shouldWrapNullValue() {
+        var exception = assertThrows(BooleanParsingException.class, () -> StrictBooleanParser.parse(null));
+        assertEquals("Invalid boolean value: null", exception.getMessage());
     }
 
     @Test
