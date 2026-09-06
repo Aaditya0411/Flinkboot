@@ -45,6 +45,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 ### Fixed
 
 #### `flinkboot-core`
+- **Checkpointing Disable Flag**:
+  - An explicit `checkpointing.enabled: false` now prevents all settings in the checkpointing block from being applied.
 - **Zero Restart Attempts Support (`@PositiveOrZero`)**:
   - Enforces `@PositiveOrZero` on `FixedDelayRestartProperties.attempts` to allow zero restart attempts (fail immediately on first failure without retries).
 - **Uniform Parsing Exception & FQCN Diagnostic**:

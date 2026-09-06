@@ -56,6 +56,54 @@ class CheckpointingCustomizerTest {
     }
 
     @Test
+    @DisplayName("Should skip checkpointing configuration when explicitly disabled")
+    void shouldSkipCheckpointingPropertiesWhenDisabled() {
+        Configuration flinkConfig = new Configuration();
+        var customizer = new CheckpointingCustomizer(flinkConfig);
+        var checkpointConfig = new CheckpointingProperties(
+            false,
+            Duration.ofMillis(10000L),
+            CheckpointingMode.EXACTLY_ONCE,
+            Duration.ofMillis(60000L),
+            Duration.ofMillis(5000L),
+            2,
+            ExternalizedCheckpointCleanupMode.RETAIN_ON_CANCELLATION,
+            true,
+            Duration.ofMillis(1000L),
+            "s3://bucket/checkpoints"
+        );
+        var envProps = new ExecutionEnvironmentProperties(null, checkpointConfig, null, null, null, null, null);
+
+        customizer.configure(envProps);
+
+        assertTrue(flinkConfig.toMap().isEmpty());
+    }
+
+    @Test
+    @DisplayName("Should apply checkpointing configuration when enabled is not specified")
+    void shouldApplyCheckpointingPropertiesWhenEnabledIsNotSpecified() {
+        Configuration flinkConfig = new Configuration();
+        var customizer = new CheckpointingCustomizer(flinkConfig);
+        var checkpointConfig = new CheckpointingProperties(
+            null,
+            Duration.ofMillis(10000L),
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null,
+            null
+        );
+        var envProps = new ExecutionEnvironmentProperties(null, checkpointConfig, null, null, null, null, null);
+
+        customizer.configure(envProps);
+
+        assertEquals(Duration.ofMillis(10000L), flinkConfig.get(CheckpointingOptions.CHECKPOINTING_INTERVAL));
+    }
+
+    @Test
     @DisplayName("Should do nothing when checkpointing configuration is empty")
     void shouldDoNothingWhenEmpty() {
         Configuration flinkConfig = new Configuration();
