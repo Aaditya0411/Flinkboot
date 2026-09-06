@@ -93,7 +93,6 @@ class EnvironmentCustomizersTest {
         var stateBackendConfig = new StateBackendProperties(
             StateBackendType.HASHMAP,
             CheckpointStorageType.JOBMANAGER,
-            null,
             false,
             false,
             null
@@ -111,13 +110,13 @@ class EnvironmentCustomizersTest {
     }
 
     @Test
-    @DisplayName("Should configure ROCKSDB state backend with incremental checkpoints and filesystem storage")
+    @DisplayName("Should configure ROCKSDB state backend without replacing checkpoint directory")
     void shouldConfigureRocksDbStateBackend() {
         Configuration config = new Configuration();
+        config.set(CheckpointingOptions.CHECKPOINTS_DIRECTORY, "file:///checkpointing-storage");
         var stateBackendConfig = new StateBackendProperties(
             StateBackendType.ROCKSDB,
             CheckpointStorageType.FILESYSTEM,
-            "file:///tmp/checkpoints",
             true,
             true,
             null
@@ -129,7 +128,7 @@ class EnvironmentCustomizersTest {
         assertAll(
             () -> assertEquals("rocksdb", config.get(StateBackendOptions.STATE_BACKEND)),
             () -> assertEquals("filesystem", config.get(CheckpointingOptions.CHECKPOINT_STORAGE)),
-            () -> assertEquals("file:///tmp/checkpoints", config.get(CheckpointingOptions.CHECKPOINTS_DIRECTORY)),
+            () -> assertEquals("file:///checkpointing-storage", config.get(CheckpointingOptions.CHECKPOINTS_DIRECTORY)),
             () -> assertTrue(config.get(CheckpointingOptions.INCREMENTAL_CHECKPOINTS))
         );
     }
@@ -140,7 +139,6 @@ class EnvironmentCustomizersTest {
         Configuration config = new Configuration();
         var stateBackendConfig = new StateBackendProperties(
             StateBackendType.CHANGELOG,
-            null,
             null,
             null,
             null,
@@ -159,7 +157,6 @@ class EnvironmentCustomizersTest {
         Configuration config = new Configuration();
         var stateBackendConfig = new StateBackendProperties(
             StateBackendType.CUSTOM,
-            null,
             null,
             null,
             null,

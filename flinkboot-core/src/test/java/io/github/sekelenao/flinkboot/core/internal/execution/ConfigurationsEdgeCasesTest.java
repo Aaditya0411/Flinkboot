@@ -97,8 +97,8 @@ class ConfigurationsEdgeCasesTest {
             () -> assertNotNull(exp1.toString())
         );
 
-        var state1 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, "s3://dir", true, true, null);
-        var state2 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, "s3://dir", true, true, null);
+        var state1 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, true, true, null);
+        var state2 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, true, true, null);
         assertAll(
             () -> assertEquals(state1, state1),
             () -> assertEquals(state1, state2),
@@ -175,9 +175,9 @@ class ConfigurationsEdgeCasesTest {
     void shouldTestInvalidStateBackendCustomClass() {
         assertAll(
             () -> assertThrows(InvalidStateBackendPropertiesException.class,
-                () -> new StateBackendProperties(StateBackendType.CUSTOM, CheckpointStorageType.JOBMANAGER, null, false, false, null)),
+                () -> new StateBackendProperties(StateBackendType.CUSTOM, CheckpointStorageType.JOBMANAGER, false, false, null)),
             () -> assertThrows(InvalidStateBackendPropertiesException.class,
-                () -> new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.JOBMANAGER, null, false, false, "com.example.CustomBackend"))
+                () -> new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.JOBMANAGER, false, false, "com.example.CustomBackend"))
         );
     }
 }

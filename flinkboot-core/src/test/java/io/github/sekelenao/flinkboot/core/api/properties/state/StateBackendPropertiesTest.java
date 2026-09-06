@@ -28,12 +28,11 @@ class StateBackendPropertiesTest {
         @Test
         @DisplayName("Should return empty optionals when all properties are null")
         void shouldReturnEmptyOptionals() {
-            var config = new StateBackendProperties(null, null, null, null, null, null);
+            var config = new StateBackendProperties(null, null, null, null, null);
 
             assertAll(
                 () -> assertTrue(config.type().isEmpty()),
                 () -> assertTrue(config.checkpointStorage().isEmpty()),
-                () -> assertTrue(config.storagePath().isEmpty()),
                 () -> assertTrue(config.incremental().isEmpty()),
                 () -> assertTrue(config.latencyTracking().isEmpty()),
                 () -> assertTrue(config.customClass().isEmpty())
@@ -51,7 +50,6 @@ class StateBackendPropertiesTest {
             var config = new StateBackendProperties(
                 StateBackendType.HASHMAP,
                 CheckpointStorageType.JOBMANAGER,
-                null,
                 false,
                 true,
                 null
@@ -72,7 +70,6 @@ class StateBackendPropertiesTest {
             var config = new StateBackendProperties(
                 StateBackendType.CUSTOM,
                 CheckpointStorageType.FILESYSTEM,
-                "s3://bucket/checkpoints",
                 true,
                 false,
                 "com.example.MyCustomStateBackend"
@@ -91,7 +88,7 @@ class StateBackendPropertiesTest {
         void shouldThrowExceptionWhenCustomClassMissingForCustomType() {
             assertThrows(
                 InvalidStateBackendPropertiesException.class,
-                () -> new StateBackendProperties(StateBackendType.CUSTOM, null, null, null, null, null)
+                () -> new StateBackendProperties(StateBackendType.CUSTOM, null, null, null, null)
             );
         }
 
@@ -100,7 +97,7 @@ class StateBackendPropertiesTest {
         void shouldThrowExceptionWhenCustomClassProvidedForNonCustomType() {
             assertThrows(
                 InvalidStateBackendPropertiesException.class,
-                () -> new StateBackendProperties(StateBackendType.ROCKSDB, null, null, null, null, "com.example.MyCustomStateBackend")
+                () -> new StateBackendProperties(StateBackendType.ROCKSDB, null, null, null, "com.example.MyCustomStateBackend")
             );
         }
     }
@@ -112,9 +109,9 @@ class StateBackendPropertiesTest {
         @Test
         @DisplayName("Should respect equals and hashCode contract")
         void shouldRespectEqualsAndHashCode() {
-            var config1 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, "s3://bucket", true, false, null);
-            var config2 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, "s3://bucket", true, false, null);
-            var config3 = new StateBackendProperties(StateBackendType.HASHMAP, CheckpointStorageType.JOBMANAGER, null, false, false, null);
+            var config1 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, true, false, null);
+            var config2 = new StateBackendProperties(StateBackendType.ROCKSDB, CheckpointStorageType.FILESYSTEM, true, false, null);
+            var config3 = new StateBackendProperties(StateBackendType.HASHMAP, CheckpointStorageType.JOBMANAGER, false, false, null);
 
             assertAll(
                 () -> assertEquals(config1, config2),
@@ -134,7 +131,6 @@ class StateBackendPropertiesTest {
             String json = "{\n" +
                 "  \"type\": \"ROCKSDB\",\n" +
                 "  \"checkpoint-storage\": \"FILESYSTEM\",\n" +
-                "  \"storage-path\": \"s3://my-bucket/checkpoints\",\n" +
                 "  \"incremental\": true,\n" +
                 "  \"latency-tracking\": true\n" +
                 "}";
@@ -145,7 +141,6 @@ class StateBackendPropertiesTest {
                 () -> assertNotNull(config),
                 () -> assertEquals(StateBackendType.ROCKSDB, config.type().orElseThrow()),
                 () -> assertEquals(CheckpointStorageType.FILESYSTEM, config.checkpointStorage().orElseThrow()),
-                () -> assertEquals("s3://my-bucket/checkpoints", config.storagePath().orElseThrow()),
                 () -> assertTrue(config.incremental().orElseThrow()),
                 () -> assertTrue(config.latencyTracking().orElseThrow())
             );

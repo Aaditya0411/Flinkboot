@@ -44,6 +44,7 @@ Verify adherence to the repository's test conventions in [`.agents/skills/test-c
 - Clean static imports for assertions (`assertThat`, `assertAll`, `assertThrows`), avoiding fully qualified class names.
 - Public constructor verification: ensure real public entry points are tested alongside any package-private `@VisibleForTesting` constructors.
 - **Utility Class Private Constructors**: When verifying that a static utility class cannot be instantiated, checking that reflection throws an `AssertionError` (e.g. `assertInstanceOf(AssertionError.class, exception.getCause())`) is sufficient. **Never flag or demand asserting the exact error message string** of a private utility constructor, as it is pedantic boilerplate with zero regression detection value.
+- **Deterministic Constraint Violation Assertions**: Never write or propose `violations.iterator().next()`. A `Set` does not guarantee iteration order and throws `NoSuchElementException` if empty. Always assert `assertEquals(expectedCount, violations.size())` and check property path matching deterministically using `assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("fieldName")), "...")`.
 
 ### 4. Boundary Robustness & Immutability
 - Data type boundaries: test edge values relevant to the domain (e.g. zero, minimum/maximum allowable values, empty strings, blank strings).
