@@ -12,10 +12,19 @@ A test class should use JUnit 5 (Jupiter) and AssertJ / JUnit assertions.
 
 - Use `assertAll` when possible to test multiple conditions in a single assertion block.
 - Use `@DisplayName` for all test classes, nested classes, and test methods with human-readable descriptions.
-- Use `@Nested` for grouping related tests by class features/lifecycle.
-- Test public API only, not private methods.
+- Use `@Nested` for grouping related tests by class features/lifecycle. Nested class names must NOT include the `Test` suffix (e.g. `@Nested @DisplayName("Validation") class Validation`, not `class ValidationTest`).
+- Test public API only, not private methods. Always test the real public constructor/entry point in addition to any `@VisibleForTesting` constructors.
 - Test edge cases (e.g. null values, empty lists, boundary limits, invalid combinations).
 - Always import classes, interfaces, and static members (like `assertThat`, `assertThrows`, `assertAll`). Do not use fully qualified package/class names directly in test code.
+
+### Parameterized Tests & Pragmatic Consolidation (The Goldilocks Rule)
+- Consolidate repetitive test methods testing the exact same invariant with different inputs using `@ParameterizedTest` with `@ValueSource`, `@CsvSource`, or `@NullAndEmptySource` (e.g. invalid boundaries `-1`, `0`, or corrupted strings `"invalid"`, `"12.5"`, `"   "`).
+- **Avoid Over-Engineering**: Never write "mega-parameterized tests" containing conditional logic (`if (shouldFail) ...`), excessive arguments, or heterogeneous assertions. A parameterized test must verify ONE single invariant at a glance.
+
+### Mutation Testing & Invariant Sensitivity
+- Design assertions that strictly fail if a production condition is inverted, swapped, or omitted.
+- Avoid symmetry blindspots: when testing multiple flags or options, test asymmetric combinations (e.g. `flagA=true` with `flagB=false`), not only lockstep combinations (`true/true` and `false/false`).
+- For any collection returned by getters or methods, explicitly verify immutability by asserting `assertThrows(UnsupportedOperationException.class, () -> collection.add(...))`.
 
 ## Testing Configuration Properties DTOs
 
