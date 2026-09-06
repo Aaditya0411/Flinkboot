@@ -41,6 +41,7 @@ When writing unit tests for `*Properties` classes, organize into structured `@Ne
 2. **`@Nested @DisplayName("Validation")`**:
    - Verify cross-field validation exceptions in constructor (e.g. invalid combinations throwing domain exceptions).
    - Verify Jakarta Bean Validation violations using `Validation.buildDefaultValidatorFactory().getValidator()`.
+   - **Deterministic Violation Assertions**: Never use `violations.iterator().next()` (anti-pattern: `Set` has no guaranteed iteration order and throws `NoSuchElementException` if empty). Always assert `assertEquals(expectedCount, violations.size())` and verify field targeting via `assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("fieldName")), "...")`.
    - Verify single-field constraints (`@NotBlank`, `@NotEmpty`, `@NotNull`, `@PositiveOrZero`, `@Positive`).
    - Verify container element validation (e.g. lists containing `null`, empty `""`, or blank `"   "` elements fail validation).
 3. **`@Nested @DisplayName("Getters")`**:
