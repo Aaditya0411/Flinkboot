@@ -19,7 +19,7 @@ public final class LocalWebUiProperties implements Serializable {
 
     private final Boolean enabled;
 
-    @Range
+    @Range(min = 0, max = 65535)
     private final Integer port;
     private final String bindAddress;
 
