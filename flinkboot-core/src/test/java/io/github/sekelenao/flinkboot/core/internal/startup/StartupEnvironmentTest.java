@@ -4,6 +4,8 @@ import io.github.sekelenao.flinkboot.core.api.exception.parsing.BooleanParsingEx
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.List;
 import java.util.Map;
@@ -20,6 +22,17 @@ class StartupEnvironmentTest {
     @Nested
     @DisplayName("Constructor")
     class Constructor {
+
+        @Test
+        @DisplayName("Should initialize properly with valid args and expose parsed options")
+        void shouldInitializeWithValidArgs() {
+            var startupEnv = new StartupEnvironment(new String[]{"--my-flag", "-key", "value"});
+            assertAll(
+                () -> assertTrue(startupEnv.flag("my-flag")),
+                () -> assertEquals("value", startupEnv.get("key").orElseThrow()),
+                () -> assertEquals(List.of("classpath:job-configuration.yaml"), startupEnv.configurationResourceLocations())
+            );
+        }
 
         @Test
         @DisplayName("Should throw NullPointerException when args array is null")
@@ -82,6 +95,26 @@ class StartupEnvironmentTest {
             var resolver = new EnvVarResolver(key -> null);
             var startupEnv = new StartupEnvironment(cmd, resolver);
             assertEquals(List.of("classpath:job-configuration.yaml"), startupEnv.configurationResourceLocations());
+        }
+
+        @Test
+        @DisplayName("Should return unmodifiable list for custom configuration locations")
+        void shouldReturnUnmodifiableListForCustomLocations() {
+            var cmd = CommandLine.parse(new String[]{"-flinkboot-configurations", "custom-config.yaml"});
+            var resolver = new EnvVarResolver(k -> null);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            var locations = startupEnv.configurationResourceLocations();
+            assertThrows(UnsupportedOperationException.class, () -> locations.add("another-config.yaml"));
+        }
+
+        @Test
+        @DisplayName("Should return unmodifiable list for default configuration location")
+        void shouldReturnUnmodifiableListForDefaultLocation() {
+            var cmd = CommandLine.parse(new String[0]);
+            var resolver = new EnvVarResolver(k -> null);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            var locations = startupEnv.configurationResourceLocations();
+            assertThrows(UnsupportedOperationException.class, () -> locations.add("another-config.yaml"));
         }
     }
 
@@ -187,11 +220,21 @@ class StartupEnvironmentTest {
             var startupEnv = new StartupEnvironment(cmd, resolver);
             assertThrows(BooleanParsingException.class, () -> startupEnv.flag("my-flag"));
         }
+
+        @Test
+        @DisplayName("Should short-circuit and return true when flag is in CommandLine even if env contains invalid boolean")
+        void shouldShortCircuitWhenFlagInCommandLineEvenIfEnvInvalid() {
+            var cmd = CommandLine.parse(new String[]{"--my-flag"});
+            var env = Map.of("MY_FLAG", "not-a-valid-boolean");
+            var resolver = new EnvVarResolver(env::get);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            assertTrue(startupEnv.flag("my-flag"));
+        }
     }
 
     @Nested
     @DisplayName("ParserFeatures")
-    class ParserFeaturesTest {
+    class ParserFeatures {
 
         @Test
         @DisplayName("Should return ParserFeatures with default values when absent")
@@ -203,6 +246,34 @@ class StartupEnvironmentTest {
             assertAll(
                 () -> assertFalse(features.permitOverride()),
                 () -> assertFalse(features.listMerging()),
+                () -> assertEquals(10, features.validationCapacity())
+            );
+        }
+
+        @Test
+        @DisplayName("Should return permitOverride=true and listMerging=false when only override is set")
+        void shouldReturnAsymmetricFeaturesWhenOnlyOverrideIsSet() {
+            var cmd = CommandLine.parse(new String[]{"--flinkboot-configuration-override"});
+            var resolver = new EnvVarResolver(k -> null);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            var features = startupEnv.parserFeatures();
+            assertAll(
+                () -> assertTrue(features.permitOverride()),
+                () -> assertFalse(features.listMerging()),
+                () -> assertEquals(10, features.validationCapacity())
+            );
+        }
+
+        @Test
+        @DisplayName("Should return permitOverride=false and listMerging=true when only listMerging is set")
+        void shouldReturnAsymmetricFeaturesWhenOnlyListMergingIsSet() {
+            var cmd = CommandLine.parse(new String[]{"--flinkboot-configuration-list-merging"});
+            var resolver = new EnvVarResolver(k -> null);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            var features = startupEnv.parserFeatures();
+            assertAll(
+                () -> assertFalse(features.permitOverride()),
+                () -> assertTrue(features.listMerging()),
                 () -> assertEquals(10, features.validationCapacity())
             );
         }
@@ -244,36 +315,24 @@ class StartupEnvironmentTest {
             );
         }
 
-        @Test
+        @ParameterizedTest(name = "value = {0}")
+        @ValueSource(strings = {"0", "-1", "-10"})
         @DisplayName("Should fallback to default capacity when validation capacity is zero or negative in CommandLine")
-        void shouldFallbackToDefaultWhenValidationCapacityIsZeroOrNegativeInCommandLine() {
-            var cmdZero = CommandLine.parse(new String[]{"-flinkboot-configuration-violations-log-size", "0"});
-            var cmdNegative = CommandLine.parse(new String[]{"-flinkboot-configuration-violations-log-size", "-1"});
+        void shouldFallbackToDefaultWhenValidationCapacityIsZeroOrNegativeInCommandLine(String size) {
+            var cmd = CommandLine.parse(new String[]{"-flinkboot-configuration-violations-log-size", size});
             var resolver = new EnvVarResolver(k -> null);
-
-            var startupEnvZero = new StartupEnvironment(cmdZero, resolver);
-            var startupEnvNegative = new StartupEnvironment(cmdNegative, resolver);
-
-            assertAll(
-                () -> assertEquals(10, startupEnvZero.parserFeatures().validationCapacity()),
-                () -> assertEquals(10, startupEnvNegative.parserFeatures().validationCapacity())
-            );
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            assertEquals(10, startupEnv.parserFeatures().validationCapacity());
         }
 
-        @Test
+        @ParameterizedTest(name = "value = {0}")
+        @ValueSource(strings = {"0", "-1", "-10"})
         @DisplayName("Should fallback to default capacity when validation capacity is zero or negative in env variables")
-        void shouldFallbackToDefaultWhenValidationCapacityIsZeroOrNegativeInEnv() {
+        void shouldFallbackToDefaultWhenValidationCapacityIsZeroOrNegativeInEnv(String size) {
             var cmd = CommandLine.parse(new String[0]);
-            var resolverZero = new EnvVarResolver(k -> "FLINKBOOT_CONFIGURATION_VIOLATIONS_LOG_SIZE".equals(k) ? "0" : null);
-            var resolverNegative = new EnvVarResolver(k -> "FLINKBOOT_CONFIGURATION_VIOLATIONS_LOG_SIZE".equals(k) ? "-10" : null);
-
-            var startupEnvZero = new StartupEnvironment(cmd, resolverZero);
-            var startupEnvNegative = new StartupEnvironment(cmd, resolverNegative);
-
-            assertAll(
-                () -> assertEquals(10, startupEnvZero.parserFeatures().validationCapacity()),
-                () -> assertEquals(10, startupEnvNegative.parserFeatures().validationCapacity())
-            );
+            var resolver = new EnvVarResolver(k -> "FLINKBOOT_CONFIGURATION_VIOLATIONS_LOG_SIZE".equals(k) ? size : null);
+            var startupEnv = new StartupEnvironment(cmd, resolver);
+            assertEquals(10, startupEnv.parserFeatures().validationCapacity());
         }
 
         @Test
