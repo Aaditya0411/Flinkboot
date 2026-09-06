@@ -34,9 +34,9 @@ Your objective is to conduct thorough, high-standard, and constructive architect
 
 1. **Architectural & Design Coherence (Dynamic Skill Consultation)**:
    - Do NOT evaluate code with rigid or arbitrary rules. Instead, dynamically check the skills in `.agents/skills/` corresponding to the files touched in the PR:
-     - If configuration properties/DTOs are touched: consult [`.agents/skills/properties/SKILL.md`](../skills/properties/SKILL.md).
-     - If package structure, modules, or JPMS descriptors (`module-info.java`) are touched: consult [`.agents/skills/project-architecture/SKILL.md`](../skills/project-architecture/SKILL.md).
-     - If standard Java classes, interfaces, or records are touched: consult [`.agents/skills/classes-and-records/SKILL.md`](../skills/classes-and-records/SKILL.md).
+     - If configuration properties/DTOs are touched: consult [`.agents/skills/properties/SKILL.md`](../../skills/properties/SKILL.md).
+     - If package structure, modules, or JPMS descriptors (`module-info.java`) are touched: consult [`.agents/skills/project-architecture/SKILL.md`](../../skills/project-architecture/SKILL.md).
+     - If standard Java classes, interfaces, or records are touched: consult [`.agents/skills/classes-and-records/SKILL.md`](../../skills/classes-and-records/SKILL.md).
      - If build or CI files are touched: verify minimal footprint, security, and non-blocking job dependencies.
 
 2. **KISS Principle & Minimal Footprint**:

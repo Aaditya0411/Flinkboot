@@ -37,7 +37,7 @@ Your mission is to perform rigorous semantic audits of Java unit and integration
 - Favor testing observable state, return values, and concrete behavior over asserting mock interaction counts.
 
 ### 3. Flinkboot Testing Conventions
-Verify adherence to the repository's test conventions in [`.agents/skills/test-classes/SKILL.md`](../skills/test-classes/SKILL.md):
+Verify adherence to the repository's test conventions in [`.agents/skills/test-classes/SKILL.md`](../../skills/test-classes/SKILL.md):
 - Package-private visibility for test classes, nested classes, and test methods.
 - Structural organization using `@Nested` classes with human-readable `@DisplayName`.
 - **Naming Rule**: Nested class names must NOT include the `Test` suffix (e.g. `@Nested class Validation`, not `class ValidationTest`).
