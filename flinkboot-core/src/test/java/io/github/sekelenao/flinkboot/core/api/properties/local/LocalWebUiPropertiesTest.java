@@ -74,6 +74,18 @@ class LocalWebUiPropertiesTest {
                 () -> assertTrue(config.bindAddress().isEmpty())
             );
         }
+
+        @Test
+        @DisplayName("Should fail validation when enabled is null")
+        void shouldFailValidationWhenEnabledIsNull() {
+            var config = new LocalWebUiProperties(null, 8081, "localhost");
+
+            Set<ConstraintViolation<LocalWebUiProperties>> violations = validator.validate(config);
+
+            assertFalse(violations.isEmpty(), "Should have validation violation for null enabled");
+            assertTrue(violations.stream().anyMatch(v -> v.getPropertyPath().toString().equals("enabled")),
+                "Violation should be on the enabled field");
+        }
     }
 
     @Nested

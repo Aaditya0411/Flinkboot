@@ -5,6 +5,8 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import io.github.sekelenao.flinkboot.core.internal.annotation.Generated;
 import org.hibernate.validator.constraints.Range;
 
+import jakarta.validation.constraints.NotNull;
+
 import java.io.Serializable;
 import java.util.Objects;
 import java.util.Optional;
@@ -17,6 +19,7 @@ public final class LocalWebUiProperties implements Serializable {
 
     private static final long serialVersionUID = 1L;
 
+    @NotNull
     private final Boolean enabled;
 
     @Range(min = 0, max = 65535)
