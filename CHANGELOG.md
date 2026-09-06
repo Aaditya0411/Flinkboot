@@ -23,6 +23,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Container Element Validation**:
   - Enforces `@NotBlank` on string collection elements across `flinkboot-kafka` and `flinkboot-fluss` (`bootstrap-servers`, `topics`) to reject empty or blank strings.
   - Enforces `@NotNull` keys and values in `ExecutionEnvironmentProperties.properties` map to prevent unhandled `null` states.
+- **Local Web UI Port Range Validation (`@Range`)**:
+  - Enforces `@Range(min = 0, max = 65535)` on `LocalWebUiProperties.port`, explicitly allowing port `0` for dynamic ephemeral port allocation in parallel test suites.
 
 ### Changed
 
@@ -36,6 +38,10 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Exhaustive Multi-Field Validation Reporting**:
   - Configuration loading now reports all missing and invalid fields simultaneously in a structured multi-line report, instead of failing on the first missing field.
 
+#### Documentation
+- **Self-Contained Mono-Repo Architecture**:
+  - Replaced external quickstart dependencies with autonomous, in-repository `howto/` guides covering setup, configuration, connectors, testing, and serialization.
+
 ### Fixed
 
 #### `flinkboot-core`
@@ -44,6 +50,8 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - **Uniform Parsing Exception & FQCN Diagnostic**:
   - Ensures all Jackson conversion errors (including `IllegalArgumentException`) are wrapped in `YamlParsingException`.
   - Displays Fully Qualified Class Names (FQCN) in configuration mapping error messages for immediate identification in cluster logs.
+- **Explicit Supported URI Schemes in Exceptions**:
+  - Clarified supported URI prefixes (`classpath:`, `file:`) in `UnrecognizedResourceException` detail messages.
 
 #### `flinkboot-test`
 - **Classpath Fallback in `FlinkbootTest`**:
