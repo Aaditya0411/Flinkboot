@@ -8,6 +8,8 @@ import jakarta.validation.Validator;
 import org.junit.jupiter.api.DisplayName;
 import org.junit.jupiter.api.Nested;
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.params.ParameterizedTest;
+import org.junit.jupiter.params.provider.ValueSource;
 
 import java.util.Set;
 
@@ -78,20 +80,22 @@ class LocalWebUiPropertiesTest {
     @DisplayName("Validation Tests")
     class ValidationTests {
 
-        @Test
-        @DisplayName("Should pass validation with valid configuration")
-        void shouldPassValidation() {
-            var config = new LocalWebUiProperties(true, 8081, "127.0.0.1");
+        @ParameterizedTest
+        @ValueSource(ints = {0, 8081, 65535})
+        @DisplayName("Should pass validation when port is within valid range")
+        void shouldPassValidationWhenPortIsWithinValidRange(int port) {
+            var config = new LocalWebUiProperties(true, port, "127.0.0.1");
 
             Set<ConstraintViolation<LocalWebUiProperties>> violations = validator.validate(config);
 
             assertTrue(violations.isEmpty(), "Should have no violations");
         }
 
-        @Test
-        @DisplayName("Should fail validation when port is negative or zero")
-        void shouldFailValidationWhenPortIsInvalid() {
-            var config = new LocalWebUiProperties(true, -1, "localhost");
+        @ParameterizedTest
+        @ValueSource(ints = {-1, 65536})
+        @DisplayName("Should fail validation when port is outside valid range")
+        void shouldFailValidationWhenPortIsOutsideValidRange(int port) {
+            var config = new LocalWebUiProperties(true, port, "localhost");
 
             Set<ConstraintViolation<LocalWebUiProperties>> violations = validator.validate(config);
 
