@@ -13,7 +13,7 @@ tools:
   - invoke_subagent
   - read_url_content
 subagent: true
-mainAgent: false
+mainAgent: true
 model: inherit
 commandExecutionPolicy: sandbox
 skills:

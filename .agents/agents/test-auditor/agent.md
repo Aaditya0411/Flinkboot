@@ -11,7 +11,7 @@ tools:
   - write_to_file
   - send_message
 subagent: true
-mainAgent: false
+mainAgent: true
 model: inherit
 commandExecutionPolicy: sandbox
 skills:
