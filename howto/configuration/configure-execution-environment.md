@@ -115,7 +115,7 @@ environment:
 
 | Property Key                      | Type       | Required | Validation                  | Description                                                                                                                   |
 |:----------------------------------|:-----------|:---------|:----------------------------|:------------------------------------------------------------------------------------------------------------------------------|
-| `enabled`                         | Boolean    | No       | Boolean                     | Enable checkpointing (`CheckpointingOptions.CHECKPOINTING_INTERVAL`).                                                         |
+| `enabled`                         | Boolean    | No       | Boolean                     | Apply the checkpointing block when `true` or omitted. When `false`, none of its settings are applied.                         |
 | `interval`                        | `Duration` | No       | `@DurationMin(millis = 1)`  | Time interval between checkpoints (`CheckpointingOptions.CHECKPOINTING_INTERVAL`), e.g. `"PT10S"`. Must be > 0.               |
 | `mode`                            | Enum       | No       | Enum                        | Checkpointing consistency mode: `EXACTLY_ONCE` or `AT_LEAST_ONCE` (`CheckpointingOptions.CHECKPOINTING_CONSISTENCY_MODE`).    |
 | `timeout`                         | `Duration` | No       | `@DurationMin(millis = 1)`  | Maximum duration for a checkpoint before aborting (`CheckpointingOptions.CHECKPOINTING_TIMEOUT`), e.g. `"PT1M"`. Must be > 0. |
