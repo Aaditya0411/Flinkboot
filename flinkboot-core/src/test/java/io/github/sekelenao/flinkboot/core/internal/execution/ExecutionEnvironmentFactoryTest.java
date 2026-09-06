@@ -205,7 +205,6 @@ class ExecutionEnvironmentFactoryTest {
             var stateConfig = new StateBackendProperties(
                 StateBackendType.ROCKSDB,
                 CheckpointStorageType.FILESYSTEM,
-                "s3://my-bucket/checkpoints",
                 true,
                 true,
                 null
@@ -220,7 +219,6 @@ class ExecutionEnvironmentFactoryTest {
             assertAll(
                 () -> assertEquals("rocksdb", flinkConfig.get(StateBackendOptions.STATE_BACKEND)),
                 () -> assertEquals("filesystem", flinkConfig.get(CheckpointingOptions.CHECKPOINT_STORAGE)),
-                () -> assertEquals("s3://my-bucket/checkpoints", flinkConfig.get(CheckpointingOptions.CHECKPOINTS_DIRECTORY)),
                 () -> assertTrue(flinkConfig.get(CheckpointingOptions.INCREMENTAL_CHECKPOINTS)),
                 () -> assertTrue(flinkConfig.get(StateLatencyTrackOptions.LATENCY_TRACK_ENABLED))
             );

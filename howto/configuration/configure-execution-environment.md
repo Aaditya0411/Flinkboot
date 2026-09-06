@@ -74,7 +74,6 @@ environment:
   state-backend:
     type: "ROCKSDB"
     checkpoint-storage: "FILESYSTEM"
-    storage-path: "s3://my-flink-bucket/checkpoints"
     incremental: true
     latency-tracking: true
   savepoint-restore:
@@ -175,7 +174,6 @@ The `restart-strategy` block accepts a `type` property (`NO_RESTART`, `FIXED_DEL
 |:---------------------|:--------|:------------------------------|:-----------|:-------------------------------------------------------------------------------------------------------------------------|
 | `type`               | Enum    | No                            | Enum       | State backend type: `HASHMAP`, `ROCKSDB`, `CHANGELOG`, or `CUSTOM` (`StateBackendOptions.STATE_BACKEND`).                |
 | `checkpoint-storage` | Enum    | No                            | Enum       | Checkpoint storage mechanism: `JOBMANAGER` or `FILESYSTEM` (`CheckpointingOptions.CHECKPOINT_STORAGE`).                  |
-| `storage-path`       | String  | No                            | String     | Base directory URI for state checkpoints, e.g. `s3://bucket/checkpoints` (`CheckpointingOptions.CHECKPOINTS_DIRECTORY`). |
 | `incremental`        | Boolean | No                            | Boolean    | Enable incremental checkpoints for RocksDB (`CheckpointingOptions.INCREMENTAL_CHECKPOINTS`).                             |
 | `latency-tracking`   | Boolean | No                            | Boolean    | Enable latency tracking metrics for state access (`StateBackendOptions.LATENCY_TRACK_ENABLED`).                          |
 | `custom-class`       | String  | **Yes** (if `type == CUSTOM`) | String     | Fully qualified class name for custom state backend. Allowed **only** when `type: CUSTOM`.                               |
