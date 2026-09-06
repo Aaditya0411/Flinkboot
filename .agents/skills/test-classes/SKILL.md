@@ -14,11 +14,17 @@ A test class should use JUnit 5 (Jupiter) and AssertJ / JUnit assertions.
 - Use `@DisplayName` for all test classes, nested classes, and test methods with human-readable descriptions.
 - Use `@Nested` for grouping related tests by class features/lifecycle. Nested class names must NOT include the `Test` suffix (e.g. `@Nested @DisplayName("Validation") class Validation`, not `class ValidationTest`).
 - Test public API only, not private methods. Always test the real public constructor/entry point in addition to any `@VisibleForTesting` constructors.
+- Utility class constructors: For static utility classes with a private constructor throwing an exception (e.g. `AssertionError`), testing via reflection to verify it throws an `AssertionError` is sufficient. Do not assert the exception message string.
 - Test edge cases (e.g. null values, empty lists, boundary limits, invalid combinations).
 - Always import classes, interfaces, and static members (like `assertThat`, `assertThrows`, `assertAll`). Do not use fully qualified package/class names directly in test code.
 
 ### Parameterized Tests & Pragmatic Consolidation (The Goldilocks Rule)
 - Consolidate repetitive test methods testing the exact same invariant with different inputs using `@ParameterizedTest` with `@ValueSource`, `@CsvSource`, or `@NullAndEmptySource` (e.g. invalid boundaries `-1`, `0`, or corrupted strings `"invalid"`, `"12.5"`, `"   "`).
+- **Separation of Distinct Business Concepts (Anti-CsvSource Bloat)**:
+  - Never merge distinct business concepts, intentions, or outcomes into a single generic parameterized test via `@CsvSource` merely for the sake of code compaction (e.g. conflating `true` validation and `false` validation in an artificial `"true, true", "false, false"` CSV table).
+  - Each distinct business idea deserves its own dedicated test method: one for `true` representations with `@ValueSource` and `assertTrue(...)`, another for `false` representations with `@ValueSource` and `assertFalse(...)`.
+  - Forcing distinct semantic paths into a multi-column `@CsvSource` destroys the test's role as living documentation, introduces indirection, and weakens diagnostic readability.
+  - Reserve `@CsvSource` exclusively for cases where inputs and expected outputs naturally express a single, multi-variable business formula belonging to the exact same behavioral invariant.
 - **Avoid Over-Engineering**: Never write "mega-parameterized tests" containing conditional logic (`if (shouldFail) ...`), excessive arguments, or heterogeneous assertions. A parameterized test must verify ONE single invariant at a glance.
 
 ### Mutation Testing & Invariant Sensitivity

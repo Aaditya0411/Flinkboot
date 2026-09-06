@@ -43,6 +43,7 @@ Verify adherence to the repository's test conventions in [`.agents/skills/test-c
 - **Naming Rule**: Nested class names must NOT include the `Test` suffix (e.g. `@Nested class Validation`, not `class ValidationTest`).
 - Clean static imports for assertions (`assertThat`, `assertAll`, `assertThrows`), avoiding fully qualified class names.
 - Public constructor verification: ensure real public entry points are tested alongside any package-private `@VisibleForTesting` constructors.
+- **Utility Class Private Constructors**: When verifying that a static utility class cannot be instantiated, checking that reflection throws an `AssertionError` (e.g. `assertInstanceOf(AssertionError.class, exception.getCause())`) is sufficient. **Never flag or demand asserting the exact error message string** of a private utility constructor, as it is pedantic boilerplate with zero regression detection value.
 
 ### 4. Boundary Robustness & Immutability
 - Data type boundaries: test edge values relevant to the domain (e.g. zero, minimum/maximum allowable values, empty strings, blank strings).
@@ -61,6 +62,11 @@ Verify adherence to the repository's test conventions in [`.agents/skills/test-c
 - **Consolidation**: Identify repetitive test methods that share identical logic with only input literal variations (e.g. multiple distinct methods testing invalid boundaries or corrupted inputs).
 - **Pragmatic `@ParameterizedTest`**:
   - Consolidate repetitive tests using `@ParameterizedTest` with `@ValueSource`, `@CsvSource`, or `@NullAndEmptySource`.
+  - **Separation of Distinct Business Concepts (Anti-CsvSource Bloat)**:
+    - Never merge distinct business concepts, intentions, or outcomes into a single generic parameterized test via `@CsvSource` merely for code compaction (e.g. bundling `true` and `false` validation into an artificial `"true, true", "false, false"` CSV table).
+    - Each distinct business idea deserves its own dedicated test method (e.g. one for `true` representations with `@ValueSource` and `assertTrue(...)`, and another for `false` representations with `@ValueSource` and `assertFalse(...)`).
+    - Merging separate semantic paths into a generic `@CsvSource` table degrades readability, obscures the business contract, and creates test bloat.
+    - Only recommend `@CsvSource` when the input and expected output represent a unified multi-variable business rule belonging to the exact same behavioral invariant.
   - **Anti-Overengineering Guardrail ("Sans abuser")**:
     - Never write "mega-parameterized tests" containing conditional branches (`if (shouldFail) ...`).
     - Keep parameters focused (maximum 3-4 arguments).
